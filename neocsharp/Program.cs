@@ -1,4 +1,6 @@
-﻿using Neo.Compiler;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Neo.Compiler;
 using Neo.Compiler.MSIL;
 using System;
 using System.IO;
@@ -42,46 +44,83 @@ namespace neocsharp
                 log.Log("Example:neon abc.cs --compatible");
                 return;
             }
+
+            var srccode = System.IO.File.ReadAllText(filename);
+            var tree = Microsoft.CodeAnalysis.CSharp.CSharpSyntaxTree.ParseText(srccode);
+
+            var op = new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary);
+            var ref1 = MetadataReference.CreateFromFile("needlib" + System.IO.Path.DirectorySeparatorChar + "mscorlib.dll");
+            var ref2 = MetadataReference.CreateFromFile("needlib" + System.IO.Path.DirectorySeparatorChar + "System.dll");
+            var ref3 = MetadataReference.CreateFromFile("needlib" + System.IO.Path.DirectorySeparatorChar + "System.Numerics.dll");
+            var ref4 = MetadataReference.CreateFromFile("needlib" + System.IO.Path.DirectorySeparatorChar + "Neo.SmartContract.Framework.dll");
+            var comp = Microsoft.CodeAnalysis.CSharp.CSharpCompilation.Create("aaa.dll", new[] { tree },
+               new[] { ref1,ref2, ref3, ref4 }, op);
+
+            var timestart = DateTime.Now;
+            var fs = new System.IO.MemoryStream();
+            var fspdb = new System.IO.MemoryStream();
+            var result = comp.Emit(fs, fspdb);
+            var timeend = DateTime.Now;
+
+            log.Log(">>compile time:" + (timeend - timestart).TotalSeconds + "s");
+            foreach (var c in result.Diagnostics)
+            {
+                log.Log(c.ToString());
+            }
+            if (result.Success==false)
+            {
+                log.Log(">>compile error");
+                Environment.Exit(-1);
+            }
+            else
+            {
+                log.Log(">>compile finish");
+            }
+            fs.Seek(0, System.IO.SeekOrigin.Begin);
+            fspdb.Seek(0, System.IO.SeekOrigin.Begin);
+
             if (bCompatible)
             {
                 log.Log("use --compatible no nep8");
             }
             string onlyname = System.IO.Path.GetFileNameWithoutExtension(filename);
             string filepdb = onlyname + ".pdb";
-            var path = Path.GetDirectoryName(filename);
-            if (!string.IsNullOrEmpty(path))
+            //set build path
+            var buildpath = Path.GetFullPath("needlib");
+            if (!string.IsNullOrEmpty(buildpath))
             {
                 try
                 {
-                    Directory.SetCurrentDirectory(path);
+                    Directory.SetCurrentDirectory(buildpath);
+                    //mono.cecil need load dll from here.
                 }
                 catch
                 {
-                    log.Log("Could not find path: " + path);
+                    log.Log("Could not find path: " + buildpath);
                     Environment.Exit(-1);
                 }
             }
 
             ILModule mod = new ILModule();
-            System.IO.Stream fs = null;
-            System.IO.Stream fspdb = null;
+            //System.IO.Stream fs = null;
+            //System.IO.Stream fspdb = null;
 
             //open file
-            try
-            {
-                fs = System.IO.File.OpenRead(filename);
+            //try
+            //{
+            //    fs = System.IO.File.OpenRead(filename);
 
-                if (System.IO.File.Exists(filepdb))
-                {
-                    fspdb = System.IO.File.OpenRead(filepdb);
-                }
+            //    if (System.IO.File.Exists(filepdb))
+            //    {
+            //        fspdb = System.IO.File.OpenRead(filepdb);
+            //    }
 
-            }
-            catch (Exception err)
-            {
-                log.Log("Open File Error:" + err.ToString());
-                return;
-            }
+            //}
+            //catch (Exception err)
+            //{
+            //    log.Log("Open File Error:" + err.ToString());
+            //    return;
+            //}
             //load module
             try
             {
@@ -124,6 +163,21 @@ namespace neocsharp
             {
                 log.Log("Convert Error:" + err.ToString());
                 return;
+            }
+
+            //set out path
+            var path = Path.GetDirectoryName(filename);
+            if (!string.IsNullOrEmpty(path))
+            {
+                try
+                {
+                    Directory.SetCurrentDirectory(path);
+                }
+                catch
+                {
+                    log.Log("Could not find path: " + path);
+                    Environment.Exit(-1);
+                }
             }
             //write bytes
             try
