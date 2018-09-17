@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neon", "neon\neon.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "neoj", "neoj\neoj.csproj", "{5FB7A952-6EAC-4BF9-AD23-AF957EF21925}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "neocsharp", "neocsharp\neocsharp.csproj", "{612FAD81-3CC0-4689-A07D-8B5B3C500392}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,8 +29,15 @@ Global
 		{5FB7A952-6EAC-4BF9-AD23-AF957EF21925}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FB7A952-6EAC-4BF9-AD23-AF957EF21925}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FB7A952-6EAC-4BF9-AD23-AF957EF21925}.Release|Any CPU.Build.0 = Release|Any CPU
+		{612FAD81-3CC0-4689-A07D-8B5B3C500392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{612FAD81-3CC0-4689-A07D-8B5B3C500392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{612FAD81-3CC0-4689-A07D-8B5B3C500392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{612FAD81-3CC0-4689-A07D-8B5B3C500392}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {05112156-9557-4A41-9CA6-8614CF21F836}
 	EndGlobalSection
 EndGlobal
